@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AuthServer.Data;
+using AuthServer.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -29,9 +30,17 @@ namespace AuthServer
             services.AddDbContext<ApplicationContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             
-            services.AddIdentity<IdentityUser, IdentityRole>(options =>
+            services.AddIdentity<User, IdentityRole>(options =>
                 {
                     options.User.RequireUniqueEmail = true;
+                    options.Password = new PasswordOptions
+                    {
+                        RequireDigit = false,
+                        RequiredLength = 6,
+                        RequireLowercase = false,
+                        RequireUppercase = false,
+                        RequireNonAlphanumeric = false
+                    };
                 })
                 .AddEntityFrameworkStores<ApplicationContext>();
             
@@ -39,7 +48,7 @@ namespace AuthServer
                 {
                     options.UserInteraction.LoginUrl = "/Auth/Index/";
                 })
-                .AddAspNetIdentity<IdentityUser>()
+                .AddAspNetIdentity<User>()
                 .AddInMemoryIdentityResources(Config.IdentityResources)
                 .AddInMemoryApiScopes(Config.ApiScopes)
                 .AddInMemoryClients(Config.Clients)
@@ -63,7 +72,7 @@ namespace AuthServer
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGet("/", async context => { await context.Response.WriteAsync("Hello World!"); });
+                endpoints.MapDefaultControllerRoute();            
             });
         }
     }

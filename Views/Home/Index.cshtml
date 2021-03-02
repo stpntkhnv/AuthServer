@@ -1,0 +1,29 @@
+﻿@using System.Security.Cryptography
+
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>title</title>
+</head>
+<body>
+<div>
+    @if (User.Identity.IsAuthenticated)
+    {
+        <h1>Ну здравствуй @User.Identity.Name</h1>
+
+        <a href="/auth/Logout">Log out</a>
+    }
+    else
+    {
+        <h1>ТЫ ЗАХОДИТЬ СОБРАЛСЯ?</h1>
+        <a href="/Auth/Index">Узнал, не?</a>
+    }
+</div>
+</body>
+</html>

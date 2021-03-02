@@ -47,7 +47,7 @@ namespace AuthServer
 
                     RedirectUris =
                     {                        
-                        "http://localhost:3000/callback",                        
+                        "http://localhost:3000/callback-oidc",                        
                     },
 
                     PostLogoutRedirectUris = { "http://localhost:3000/logout-oidc" },
