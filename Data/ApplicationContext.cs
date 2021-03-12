@@ -12,5 +12,7 @@ namespace AuthServer.Data
         {
             Database.EnsureCreated();
         }
+
+        private DbSet<UserProfile> UserProfiles { get; set; }
     }
 }

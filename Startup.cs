@@ -47,6 +47,7 @@ namespace AuthServer
             var builder = services.AddIdentityServer(options =>
                 {
                     options.UserInteraction.LoginUrl = "/Auth/Index/";
+                    options.UserInteraction.LogoutUrl = "/Auth/Logout/";
                 })
                 .AddAspNetIdentity<User>()
                 .AddInMemoryIdentityResources(Config.IdentityResources)

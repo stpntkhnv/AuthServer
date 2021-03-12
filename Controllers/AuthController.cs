@@ -1,9 +1,13 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
+using AuthServer.Data;
 using AuthServer.Models;
 using AuthServer.ViewModel;
 using IdentityServer4;
+using IdentityServer4.Services;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -14,11 +18,15 @@ namespace AuthServer.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
+        private readonly IIdentityServerInteractionService _interaction;
+        private readonly ApplicationContext _context;
 
-        public AuthController(UserManager<User> userManager, SignInManager<User> signInManager)
+        public AuthController(UserManager<User> userManager, SignInManager<User> signInManager, IIdentityServerInteractionService interaction, ApplicationContext context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _interaction = interaction;
+            _context = context;
         }
 
         public IActionResult Index(string returnUrl)
@@ -86,6 +94,21 @@ namespace AuthServer.Controllers
                 //return View("Index", model);
             }
 
+            UserProfile profile = new UserProfile
+            {
+                Email = user.Email,
+                UserName = user.UserName,
+                AvatarUrl = "https://www.freepngimg.com/thumb/facebook/62681-flat-icons-face-computer-design-avatar-icon.png",
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                Id = Guid.NewGuid().ToString(),
+                Status = string.Empty,
+                UserId = user.Id
+            };
+
+            var addProfileResult = await _context.AddAsync(profile);
+            await _context.SaveChangesAsync();
+
             user = await _userManager.FindByEmailAsync(model.Email);
 
             var issuer = new IdentityServerUser(user.Id)
@@ -99,11 +122,15 @@ namespace AuthServer.Controllers
             return RedirectToAction("Index", "Home");
         }
 
+        //TODO added return to cli4nt's returnUrl
         [HttpGet]
-        public async Task<IActionResult> Logout()
+        public async Task<IActionResult> Logout(string logoutId)
         {
-            await _signInManager.SignOutAsync();
-            return RedirectToAction("Index", "Home");
+            var a = HttpContext;
+            var logoutContext = await _interaction.GetLogoutContextAsync(logoutId);
+            string returnUrl = logoutContext.PostLogoutRedirectUri;
+            await HttpContext.SignOutAsync();
+            return Redirect("http://localhost:3000");
         }
         public AuthViewModel CreateAuthViewModel(string returnUrl)
         {

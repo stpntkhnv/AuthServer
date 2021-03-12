@@ -50,7 +50,7 @@ namespace AuthServer
                         "http://localhost:3000/callback-oidc",                        
                     },
 
-                    PostLogoutRedirectUris = { "http://localhost:3000/logout-oidc" },
+                    PostLogoutRedirectUris = { "http://localhost:3000/signout-oidc" },
                     AllowedCorsOrigins = { "http://localhost:3000" },
 
                     AllowedScopes = new List<string>
